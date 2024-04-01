@@ -1,32 +1,55 @@
 
 locals {
-  resource_group_location = "northeurope"
   resource_prefix = "aks"
 }
 
-resource "azurerm_resource_group" "default" {
+resource "azurerm_resource_group" "rg" {
   name     = "${local.resource_prefix}-rg"
-  location = local.resource_group_location
+  location = var.resource_group_location
   tags = {
     environment = "dev"
   }
 }
 
-resource "azurerm_virtual_network" "default" {
+resource "azurerm_virtual_network" "vn" {
   name                = "${local.resource_prefix}-vn"
-  resource_group_name = azurerm_resource_group.default.name
-  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
   address_space       = ["10.123.0.0/16"]
   tags = {
     environment = "dev"
   }
 }
 
-resource "azurerm_subnet" "default" {
-  name                 = "${local.resource_prefix}-sn"
-  resource_group_name  = azurerm_resource_group.default.name
-  virtual_network_name = azurerm_virtual_network.default.name
-  address_prefixes     = ["10.123.1.0/24"]
+
+resource "azurerm_kubernetes_cluster" "k8s" {
+  name                = "${local.resource_prefix}-cluster"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  dns_prefix          = "k8s"
+  kubernetes_version  = var.kubernetes_version
+
+  sku_tier = "Free"
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  default_node_pool {
+    name            = "agentpool"
+    node_count      = 1
+    vm_size         = "Standard_B2ls_v2"
+    os_disk_size_gb = 30
+  }
+  
+  network_profile {
+    network_plugin    = "kubenet"
+    load_balancer_sku = "standard"
+  }
+
+  tags = {
+    environment = "dev"
+  }
 }
 
 
