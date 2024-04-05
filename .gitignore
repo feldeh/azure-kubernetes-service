@@ -4,3 +4,4 @@ terraform.tfstate.*
 terraform.tfstate
 *.tfplan
 azurek8s
+cluster_info_dump

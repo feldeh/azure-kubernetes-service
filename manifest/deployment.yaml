@@ -1,27 +1,28 @@
 apiVersion: apps/v1
-kind: Deployment 
+kind: Deployment
 metadata:
-  name: nginx-v1
+  name: next-app
 spec:
-  replicas: 1 
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx-v1 
+      app: next-app
   template:
     metadata:
       labels:
-        app: nginx-v1 
+        app: next-app
     spec:
       containers:
-      - name: nginx-v1
-        image: nginx:1.25.2 
+      - name: next-app-container
+        image: acr2dnd549.azurecr.io/next:v4
+        imagePullPolicy: IfNotPresent
         ports:
         - name: http
-          containerPort: 80
-        resources:
-          limits:
-            cpu: "0.5"  
-            memory: "512Mi"  
-          requests:
-            cpu: "0.25"  
-            memory: "256Mi"
+          containerPort: 3000
+        # resources:
+        #   limits:
+        #     cpu: "0.5"  
+        #     memory: "512Mi"  
+        #   requests:
+        #     cpu: "0.25"  
+        #     memory: "256Mi"
